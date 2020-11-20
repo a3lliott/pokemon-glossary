@@ -11,12 +11,19 @@ function App() {
 
   useEffect(() => {
     setLoading(true)
-    axios.get(currentPageUrl).then(res => {
+    let cancel
+    axios.get(currentPageUrl, {
+      cancelToken: new axios.CancelToken(c => cancel = c)
+    }).then(res => {
       setLoading(false)
       setNextPageUrl(res.data.next)
       setPrevPageUrl(res.data.previous)
       setPokemon(res.data.results.map(p => p.name))
     })
+
+    return () => {
+        cancel()
+    }
   }, [currentPageUrl])
 
   if (loading) return "Loading..."
